@@ -37,6 +37,9 @@ const PAYMENT_CONFIG = {
 // ==========================================================================
 // FORMATION (prix en dollars uniquement)
 // ==========================================================================
+// Taille maximale de la capture d'écran (Mo)
+const MAX_PROOF_SIZE_MB = 10;
+
 const TRAINING = {
   name: "Formation Data",
   priceUsd: 30.0
@@ -294,7 +297,19 @@ const TRANSLATIONS = {
     "contact.title": "Contact us",
     "contact.intro": "A question about the training or the payment? Write to us or call us.",
     "contact.phone": "Phone",
-    "contact.email": "Email"
+    "contact.email": "Email",
+    "common.copied": "Copied:",
+    "common.copy": "Copy",
+    "global.country": "Selected country:",
+    "global.amount": "Training fee:",
+    "global.payBtn": "Pay via Chariow (Cards & local methods)",
+    "chw.fileHint": "JPG, PNG, WebP or HEIC (transfer receipt or Chariow confirmation)",
+    "proof.remove": "Remove",
+    "proof.selected": "Screenshot selected ✓",
+    "proof.loaded": "Screenshot loaded:",
+    "proof.required": "Please upload your payment screenshot first.",
+    "proof.errType": "Please choose an image file (JPG, PNG, WebP or HEIC).",
+    "proof.errSize": "The image is too large (max {max} MB)."
   },
   fr: {
     "common.continue": "Continuer",
@@ -348,7 +363,19 @@ const TRANSLATIONS = {
     "contact.title": "Contactez-nous",
     "contact.intro": "Une question sur la formation ou le paiement ? Écrivez-nous ou appelez-nous.",
     "contact.phone": "Téléphone",
-    "contact.email": "E-mail"
+    "contact.email": "E-mail",
+    "common.copied": "Copié :",
+    "common.copy": "Copier",
+    "global.country": "Pays sélectionné :",
+    "global.amount": "Montant de la formation :",
+    "global.payBtn": "Payer via Chariow (Cartes & Moyens locaux)",
+    "chw.fileHint": "JPG, PNG, WebP ou HEIC (reçu de transfert ou confirmation Chariow)",
+    "proof.remove": "Supprimer",
+    "proof.selected": "Capture d'écran sélectionnée ✓",
+    "proof.loaded": "Capture d'écran chargée :",
+    "proof.required": "Veuillez d'abord téléverser votre capture d'écran de paiement.",
+    "proof.errType": "Veuillez choisir une image (JPG, PNG, WebP ou HEIC).",
+    "proof.errSize": "L'image est trop volumineuse (max {max} Mo)."
   }
 };
 
@@ -358,7 +385,7 @@ class App {
 
     this.userState = {
       name: "",
-      email: "user@example.com"
+      email: ""
     };
 
     // Checkout state
@@ -376,13 +403,15 @@ class App {
 
   init() {
     this.initCursorGlow();
-    this.populateWorldCountries();
-    this.setLanguage(this.currentLang);
+    this.initDropzone();
+    this.initAccessibility();
 
-    const savedLang = localStorage.getItem("learn-more-data-lang");
-    if (savedLang && (savedLang === "en" || savedLang === "fr")) {
-      this.setLanguage(savedLang);
-    }
+    let savedLang = null;
+    try {
+      savedLang = localStorage.getItem("learn-more-data-lang");
+    } catch (e) { /* storage unavailable (private mode) */ }
+
+    this.setLanguage(savedLang === "en" || savedLang === "fr" ? savedLang : this.currentLang);
   }
 
   /* -------------------------------------------------------------
@@ -403,7 +432,9 @@ class App {
 
   setLanguage(lang) {
     this.currentLang = lang;
-    localStorage.setItem("learn-more-data-lang", lang);
+    try {
+      localStorage.setItem("learn-more-data-lang", lang);
+    } catch (e) { /* storage unavailable (private mode) */ }
     document.documentElement.setAttribute("lang", lang);
 
     document.getElementById("langEnBtn").classList.toggle("active", lang === "en");
@@ -415,6 +446,8 @@ class App {
         el.textContent = TRANSLATIONS[lang][key];
       }
     });
+
+    if (!this.checkoutSession.uploadedFile) this.resetProofUpload();
 
     this.populateWorldCountries();
   }
@@ -608,24 +641,34 @@ class App {
      Screenshot Proof Upload (Capture comme preuve de paiement)
      ------------------------------------------------------------- */
   handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-      this.checkoutSession.uploadedFile = file;
+    this.setProofFile(event.target.files[0]);
+  }
 
-      const previewContainer = document.getElementById("proofPreviewContainer");
-      const previewImg = document.getElementById("proofPreviewImg");
-      const previewName = document.getElementById("proofPreviewName");
-      const previewSize = document.getElementById("proofPreviewSize");
+  setProofFile(file) {
+    if (!file) return;
 
-      previewImg.src = URL.createObjectURL(file);
-      previewName.textContent = file.name;
-      previewSize.textContent = `${Math.round(file.size / 1024)} KB`;
-
-      previewContainer.style.display = "flex";
-      document.getElementById("uploadDropText").textContent = this.currentLang === "fr" ? "Capture d'écran sélectionnée ✓" : "Screenshot selected ✓";
-
-      this.showToast(this.currentLang === "fr" ? `Capture d'écran chargée : ${file.name}` : `Screenshot loaded: ${file.name}`);
+    if (!file.type.startsWith("image/")) {
+      this.showToast(this.t("proof.errType"));
+      this.resetProofUpload();
+      return;
     }
+    if (file.size > MAX_PROOF_SIZE_MB * 1024 * 1024) {
+      this.showToast(this.t("proof.errSize").replace("{max}", MAX_PROOF_SIZE_MB));
+      this.resetProofUpload();
+      return;
+    }
+
+    this.resetProofUpload();
+    this.checkoutSession.uploadedFile = file;
+    this.previewUrl = URL.createObjectURL(file);
+
+    document.getElementById("proofPreviewImg").src = this.previewUrl;
+    document.getElementById("proofPreviewName").textContent = file.name;
+    document.getElementById("proofPreviewSize").textContent = `${Math.round(file.size / 1024)} KB`;
+    document.getElementById("proofPreviewContainer").style.display = "flex";
+    document.getElementById("uploadDropText").textContent = this.t("proof.selected");
+
+    this.showToast(`${this.t("proof.loaded")} ${file.name}`);
   }
 
   removeSelectedFile(event) {
@@ -635,6 +678,11 @@ class App {
 
   resetProofUpload() {
     this.checkoutSession.uploadedFile = null;
+    if (this.previewUrl) {
+      URL.revokeObjectURL(this.previewUrl);
+      this.previewUrl = null;
+    }
+
     const fileInput = document.getElementById("proofFileInput");
     if (fileInput) fileInput.value = "";
 
@@ -642,18 +690,56 @@ class App {
     if (previewContainer) previewContainer.style.display = "none";
 
     const dropText = document.getElementById("uploadDropText");
-    if (dropText) {
-      dropText.textContent = this.currentLang === "fr" ? "Cliquez ou glissez votre capture d'écran ici" : "Click or drop your screenshot here";
-    }
+    if (dropText) dropText.textContent = this.t("chw.uploadScreenshot");
+  }
+
+  initDropzone() {
+    const zone = document.getElementById("proofDropzone");
+    if (!zone) return;
+
+    ["dragenter", "dragover"].forEach((evt) => {
+      zone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        zone.classList.add("dragover");
+      });
+    });
+    ["dragleave", "drop"].forEach((evt) => {
+      zone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        zone.classList.remove("dragover");
+      });
+    });
+    zone.addEventListener("drop", (e) => {
+      this.setProofFile(e.dataTransfer.files[0]);
+    });
+  }
+
+  /* -------------------------------------------------------------
+     Accessibility: keyboard support for clickable cards, Escape to close
+     ------------------------------------------------------------- */
+  initAccessibility() {
+    document.querySelectorAll("div[onclick]").forEach((el) => {
+      if (el.classList.contains("brand-logo") || el.classList.contains("upload-dropzone") || el.classList.contains("payment-rail-card") || el.classList.contains("selection-card")) {
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const target = e.target;
+      if ((e.key === "Enter" || e.key === " ") && target.getAttribute && target.getAttribute("role") === "button") {
+        e.preventDefault();
+        target.click();
+      }
+      if (e.key === "Escape") this.closeCheckout();
+    });
   }
 
   submitPaymentProof() {
-    // If no file was uploaded, encourage the user to select one or simulate a demo receipt
+    // The screenshot is mandatory
     if (!this.checkoutSession.uploadedFile) {
-      const confirmDemo = confirm(this.currentLang === "fr"
-        ? "Vous n'avez pas encore téléversé de capture d'écran. Souhaitez-vous valider avec une capture de démonstration ?"
-        : "You haven't uploaded a screenshot yet. Would you like to proceed with a demo confirmation screenshot?");
-      if (!confirmDemo) return;
+      this.showToast(this.t("proof.required"));
+      return;
     }
 
     // Move to Step 3: Verification
@@ -665,28 +751,34 @@ class App {
     document.getElementById("pollingSuccess").style.display = "none";
 
     // Simulate verification
-    setTimeout(() => {
+    clearTimeout(this.pollTimer);
+    this.pollTimer = setTimeout(() => {
       document.getElementById("pollingInProgress").style.display = "none";
       document.getElementById("pollingSuccess").style.display = "flex";
     }, 2200);
   }
 
   copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      this.showToast(this.currentLang === "fr" ? `Copié : ${text}` : `Copied: ${text}`);
-    }).catch(() => {
-      this.showToast(`Copié : ${text}`);
-    });
+    const done = () => this.showToast(`${this.t("common.copied")} ${text}`);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(done);
+    } else {
+      done();
+    }
   }
 
   showToast(message) {
     const container = document.getElementById("toastContainer");
     const toast = document.createElement("div");
     toast.className = "toast";
-    toast.innerHTML = `
-      <span style="color: var(--brand-400);">●</span>
-      <span>${message}</span>
-    `;
+
+    const dot = document.createElement("span");
+    dot.style.color = "var(--brand-400)";
+    dot.textContent = "●";
+    const text = document.createElement("span");
+    text.textContent = message; // textContent: never interpret user-provided text (e.g. file names) as HTML
+
+    toast.append(dot, text);
     container.appendChild(toast);
 
     setTimeout(() => {

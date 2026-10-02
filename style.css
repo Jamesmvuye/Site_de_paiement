@@ -234,12 +234,6 @@ body {
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.glass-card-hover:hover {
-  transform: translateY(-3px);
-  border-color: rgba(37, 99, 235, 0.4);
-  box-shadow: var(--glow), var(--card-shadow);
-}
-
 .glass-highlight {
   position: absolute;
   inset: 0;
@@ -252,43 +246,9 @@ body {
    Typography & Utilities
    ========================================================================== */
 
-.text-brand-300 { color: var(--brand-300); }
-.text-brand-400 { color: var(--brand-400); }
-.text-brand-500 { color: var(--brand-500); }
 .text-emerald-400 { color: #34d399; }
-.text-rose-400 { color: #f87171; }
-.text-amber-400 { color: #fbbf24; }
 .text-muted { color: var(--text-muted); }
 .text-faint { color: var(--text-faint); }
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  border-radius: 9999px;
-  text-transform: capitalize;
-}
-
-.badge-active {
-  background: rgba(52, 211, 153, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.25);
-}
-
-.badge-pending {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.25);
-}
-
-.badge-brand {
-  background: rgba(37, 99, 235, 0.15);
-  color: var(--brand-300);
-  border: 1px solid rgba(37, 99, 235, 0.3);
-}
 
 /* ==========================================================================
    Buttons & Inputs
@@ -365,23 +325,6 @@ body {
 .btn-secondary:hover {
   background: var(--btn-secondary-bg-hover);
   border-color: rgba(148, 163, 184, 0.3);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline:hover {
-  border-color: var(--brand-500);
-  background: rgba(37, 99, 235, 0.08);
 }
 
 .input-label {
@@ -875,11 +818,6 @@ body {
   box-shadow: 0 0 14px rgba(37, 99, 235, 0.25);
 }
 
-.operator-logo {
-  height: 28px;
-  object-fit: contain;
-}
-
 /* Summary Box */
 .order-summary-box {
   background: var(--surface-muted);
@@ -954,31 +892,6 @@ body {
 .copy-btn:hover {
   background: rgba(147, 197, 253, 0.2);
   color: #fff;
-}
-
-/* Proof Tabs */
-.proof-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.proof-tab-btn {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 0.5rem 0.25rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.proof-tab-btn.active {
-  color: var(--brand-400);
-  border-bottom-color: var(--brand-500);
 }
 
 .upload-dropzone {
@@ -1337,4 +1250,26 @@ body {
   color: #fff;
   background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
   flex-shrink: 0;
+}
+
+/* Drag & drop + keyboard focus */
+.upload-dropzone.dragover {
+  border-color: var(--brand-400);
+  background: rgba(37, 99, 235, 0.15);
+}
+
+[role="button"]:focus-visible,
+a:focus-visible,
+button:focus-visible,
+.input:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.spinner) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

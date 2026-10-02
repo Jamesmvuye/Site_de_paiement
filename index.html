@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#040b24">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%232563eb%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2720%27 font-family=%27Arial%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27%3EL%3C/text%3E%3C/svg%3E">
   <title>LEARN MORE DATA – Formation en Data</title>
   <meta name="description" content="LEARN MORE DATA – centre de formation en data. Paiement simple et rapide par Mobile Money ou carte bancaire.">
   <link rel="stylesheet" href="style.css">
@@ -70,7 +73,7 @@
               </div>
               <div style="margin-bottom: 1.2rem;">
                 <label class="input-label" data-i18n="landing.emailLabel">Adresse e-mail</label>
-                <input type="email" id="emailInput" class="input" placeholder="you@example.com" required value="user@example.com">
+                <input type="email" id="emailInput" class="input" placeholder="you@example.com" required autocomplete="email">
               </div>
               <button type="submit" class="btn-primary" style="width: 100%;" id="continueBtn">
                 <span id="continueBtnText" data-i18n="common.continue">Continuer</span>
@@ -200,11 +203,11 @@
     </main>
 
     <!-- CHECKOUT / MOBILE MONEY PAYMENT MODAL -->
-    <div class="checkout-overlay" id="checkoutModal">
+    <div class="checkout-overlay" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
       <div class="checkout-modal">
         <div class="checkout-header">
           <h3 id="checkoutModalTitle" data-i18n="checkout.title">Effectuer un paiement</h3>
-          <button class="checkout-close-btn" onclick="app.closeCheckout()">&times;</button>
+          <button class="checkout-close-btn" onclick="app.closeCheckout()" aria-label="Fermer">&times;</button>
         </div>
 
         <div class="checkout-body">
@@ -302,7 +305,7 @@
                   <span class="transfer-value">
                     <span id="recipientNumber" class="payment-number">09 89 34 20 97</span>
                     <span id="recipientNameDisplay" class="payment-name">(Elisha)</span>
-                    <button class="copy-btn" onclick="app.copyToClipboard(document.getElementById('recipientNumber').textContent)">Copier</button>
+                    <button class="copy-btn" data-i18n="common.copy" onclick="app.copyToClipboard(document.getElementById('recipientNumber').textContent)">Copier</button>
                   </span>
                 </div>
               </div>
@@ -316,17 +319,17 @@
             <div id="branchGlobalPayment" style="display: none;">
               <div style="background: var(--surface-muted); border: 1px solid var(--border); border-radius: 0.85rem; padding: 1.15rem; margin-bottom: 1.25rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                  <span style="font-size: 0.85rem; color: var(--text-muted);">Pays sélectionné :</span>
+                  <span style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="global.country">Pays sélectionné :</span>
                   <strong id="globalCountryDisplay" style="color: var(--text);">France</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                  <span style="font-size: 0.85rem; color: var(--text-muted);">Montant de la formation :</span>
+                  <span style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="global.amount">Montant de la formation :</span>
                   <strong class="text-emerald-400 font-mono" id="globalAmountDisplay" style="font-size: 1.1rem;">$30.00 USD</strong>
                 </div>
 
                 <!-- Chariow Link Button -->
                 <a href="https://nbceuxnh.mychariow.shop/prd_9t3aiy2q/checkout" target="_blank" rel="noopener noreferrer" class="chariow-pay-btn" id="chariowLinkBtn">
-                  <span>Payer via Chariow (Cartes & Moyens locaux)</span>
+                  <span data-i18n="global.payBtn">Payer via Chariow (Cartes & Moyens locaux)</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
                   </svg>
@@ -352,8 +355,8 @@
                 <p style="font-size: 0.875rem; font-weight: 600;" id="uploadDropText" data-i18n="chw.uploadScreenshot">
                   Cliquez ou glissez votre capture d'écran ici
                 </p>
-                <p class="text-faint" style="font-size: 0.75rem; margin-top: 0.25rem;">
-                  JPG, PNG, WebP ou HEIC (Reçu de transfert ou confirmation Chariow)
+                <p class="text-faint" style="font-size: 0.75rem; margin-top: 0.25rem;" data-i18n="chw.fileHint">
+                  JPG, PNG, WebP ou HEIC (reçu de transfert ou confirmation Chariow)
                 </p>
                 <input type="file" id="proofFileInput" accept="image/*" style="display: none;" onchange="app.handleFileSelect(event)">
               </div>
@@ -365,7 +368,7 @@
                   <div class="proof-preview-name" id="proofPreviewName">capture.png</div>
                   <div class="proof-preview-size" id="proofPreviewSize">120 KB</div>
                 </div>
-                <button type="button" class="proof-remove-btn" onclick="app.removeSelectedFile(event)">&times; Supprimer</button>
+                <button type="button" class="proof-remove-btn" onclick="app.removeSelectedFile(event)">&times; <span data-i18n="proof.remove">Supprimer</span></button>
               </div>
             </div>
 
