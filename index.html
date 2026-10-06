@@ -335,13 +335,13 @@
                   </svg>
                 </a>
                 <p class="text-faint" style="font-size: 0.75rem; text-align: center; margin-top: 0.35rem;" data-i18n="chw.linkHint">
-                  Le paiement s'ouvre dans un nouvel onglet sécurisé. Une fois validé, déposez la capture de confirmation ci-dessous.
+                  Le paiement s'ouvre dans un nouvel onglet sécurisé. Aucune capture d'écran n'est nécessaire : Chariow confirme votre paiement automatiquement.
                 </p>
               </div>
             </div>
 
             <!-- PROOF OF PAYMENT: Screenshot Upload (Capture d'écran comme preuve) -->
-            <div style="margin-top: 1rem;">
+            <div id="proofSection" style="margin-top: 1rem;">
               <label class="input-label" style="font-weight: 600; color: var(--text);" data-i18n="direct.proofLabel">
                 Capture d'écran comme preuve de paiement (obligatoire) :
               </label>
@@ -356,7 +356,7 @@
                   Cliquez ou glissez votre capture d'écran ici
                 </p>
                 <p class="text-faint" style="font-size: 0.75rem; margin-top: 0.25rem;" data-i18n="chw.fileHint">
-                  JPG, PNG, WebP ou HEIC (reçu de transfert ou confirmation Chariow)
+                  JPG, PNG, WebP ou HEIC (reçu de transfert Mobile Money)
                 </p>
                 <input type="file" id="proofFileInput" accept="image/*" style="display: none;" onchange="app.handleFileSelect(event)">
               </div>

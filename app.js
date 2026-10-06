@@ -283,7 +283,7 @@ const TRANSLATIONS = {
     "direct.cancelGoBack": "Back",
     "direct.madeTransfer": "Submit my proof of payment",
     "chw.uploadScreenshot": "Click or drop your screenshot here",
-    "chw.linkHint": "Payment opens in a secure window. Once completed, upload your confirmation screenshot below.",
+    "chw.linkHint": "Payment opens in a secure window. No screenshot is needed: Chariow confirms your payment automatically.",
     "cb.confirming": "Confirming your payment…",
     "cb.verifying": "We're verifying your proof of payment. Your training access will be activated.",
     "cb.cameThrough": "We are verifying this screenshot. You will receive an email with the training information and the link to join the group.",
@@ -313,7 +313,7 @@ const TRANSLATIONS = {
     "global.country": "Selected country:",
     "global.amount": "Training fee:",
     "global.payBtn": "Pay via Chariow (Cards & local methods)",
-    "chw.fileHint": "JPG, PNG, WebP or HEIC (transfer receipt or Chariow confirmation)",
+    "chw.fileHint": "JPG, PNG, WebP or HEIC (Mobile Money transfer receipt)",
     "proof.remove": "Remove",
     "proof.selected": "Screenshot selected ✓",
     "proof.loaded": "Screenshot loaded:",
@@ -351,7 +351,7 @@ const TRANSLATIONS = {
     "direct.cancelGoBack": "Retour",
     "direct.madeTransfer": "Soumettre ma preuve de paiement",
     "chw.uploadScreenshot": "Cliquez ou glissez votre capture d'écran ici",
-    "chw.linkHint": "Le paiement s'ouvre dans un nouvel onglet sécurisé. Une fois validé, déposez la capture de confirmation ci-dessous.",
+    "chw.linkHint": "Le paiement s'ouvre dans un nouvel onglet sécurisé. Aucune capture d'écran n'est nécessaire : Chariow confirme votre paiement automatiquement.",
     "cb.confirming": "Confirmation de votre paiement…",
     "cb.verifying": "Nous vérifions votre preuve de paiement. Votre accès à la formation sera activé.",
     "cb.cameThrough": "Nous procédons à la vérification de cette capture et vous recevrez un mail contenant les informations de la formation et le lien pour rejoindre le groupe.",
@@ -381,7 +381,7 @@ const TRANSLATIONS = {
     "global.country": "Pays sélectionné :",
     "global.amount": "Montant de la formation :",
     "global.payBtn": "Payer via Chariow (Cartes & Moyens locaux)",
-    "chw.fileHint": "JPG, PNG, WebP ou HEIC (reçu de transfert ou confirmation Chariow)",
+    "chw.fileHint": "JPG, PNG, WebP ou HEIC (reçu de transfert Mobile Money)",
     "proof.remove": "Supprimer",
     "proof.selected": "Capture d'écran sélectionnée ✓",
     "proof.loaded": "Capture d'écran chargée :",
@@ -611,6 +611,10 @@ class App {
     const branchRdc = document.getElementById("branchRdcPayment");
     const branchGlobal = document.getElementById("branchGlobalPayment");
 
+    // La capture d'écran n'est demandée que pour le Mobile Money (RDC) ; Chariow confirme lui-même le paiement.
+    document.getElementById("proofSection").style.display = isRdc ? "block" : "none";
+    document.getElementById("submitProofBtn").style.display = isRdc ? "" : "none";
+
     if (isRdc) {
       branchRdc.style.display = "block";
       branchGlobal.style.display = "none";
@@ -787,7 +791,10 @@ class App {
   }
 
   async submitPaymentProof() {
-    // The screenshot is mandatory
+    // Chariow (GLOBAL) : pas de capture, le paiement se fait et se confirme sur Chariow
+    if (this.checkoutSession.paymentRail !== "RDC") return;
+
+    // The screenshot is mandatory (Mobile Money RDC)
     if (!this.checkoutSession.uploadedFile) {
       this.showToast(this.t("proof.required"));
       return;

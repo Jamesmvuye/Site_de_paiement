@@ -18,7 +18,8 @@ Page web interactive du centre de formation **LEARN MORE DATA** : l'apprenant sa
 ### 3. Étape 2 : Paiement & preuve
 - **RDC** : choix de l'opérateur, puis affichage du **numéro de dépôt** avec, entre parenthèses, le **nom associé** à ce numéro.
 - **Autres pays et cartes** : pays sélectionné, montant en USD et bouton **« Payer via Chariow »**.
-- Dans les deux cas : téléversement de la capture d'écran comme preuve, puis **« Soumettre ma preuve de paiement »**.
+- **Mobile Money (RDC)** : téléversement obligatoire de la capture d'écran comme preuve, puis **« Soumettre ma preuve de paiement »**.
+- **Chariow** : aucune capture demandée ; Chariow confirme lui-même le paiement. Ces paiements ne sont donc pas enregistrés dans Supabase.
 
 ### 4. Étape 3 : Confirmation
 - Vérification simulée, puis écran **« Capture reçue ! »** avec un message indiquant que la capture est en cours de vérification et que la personne recevra un e-mail (informations de la formation et groupe).
