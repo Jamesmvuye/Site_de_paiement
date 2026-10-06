@@ -47,6 +47,19 @@ const TRAINING = { name: "Formation Data", priceUsd: 30.0 };
 
 ---
 
+## Backend (Supabase)
+
+Les preuves de paiement sont stockées dans Supabase (bucket privé) et chaque demande est enregistrée dans la table `payments`.
+
+1. Créez un projet Supabase, puis collez [`supabase/schema.sql`](supabase/schema.sql) dans *SQL Editor* et lancez-le.
+2. Dans *Authentication > Users*, créez le compte administrateur (e-mail `teachingdep@gmail.com`, « Auto Confirm User »), puis relancez la dernière requête du fichier SQL pour lui donner les droits.
+3. Renseignez `SUPABASE_URL` et `SUPABASE_ANON_KEY` dans [`config.js`](config.js) (*Project Settings > API*). Seule la clé publique `anon` y a sa place : jamais la clé `service_role` ni un jeton `sbp_...`.
+4. Les paiements se valident sur [`admin.html`](admin.html) (connexion e-mail + mot de passe).
+
+La sécurité repose sur les règles RLS : un visiteur peut seulement créer une demande « en attente » et envoyer une image ; seuls les administrateurs peuvent lire et valider.
+
+---
+
 ## Lancer le projet
 
 Aucune dépendance (HTML5, CSS3, JavaScript). Ouvrez simplement [`index.html`](index.html) dans un navigateur.

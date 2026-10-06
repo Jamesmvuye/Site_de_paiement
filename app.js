@@ -40,6 +40,16 @@ const PAYMENT_CONFIG = {
 // Taille maximale de la capture d'écran (Mo)
 const MAX_PROOF_SIZE_MB = 10;
 
+// Stockage Supabase des preuves de paiement (voir supabase/schema.sql)
+const PROOF_BUCKET = "payment-proofs";
+const PROOF_EXTENSIONS = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif"
+};
+
 const TRAINING = {
   name: "Formation Data",
   priceUsd: 30.0
@@ -309,7 +319,9 @@ const TRANSLATIONS = {
     "proof.loaded": "Screenshot loaded:",
     "proof.required": "Please upload your payment screenshot first.",
     "proof.errType": "Please choose an image file (JPG, PNG, WebP or HEIC).",
-    "proof.errSize": "The image is too large (max {max} MB)."
+    "proof.errSize": "The image is too large (max {max} MB).",
+    "submit.error": "Sending failed. Check your connection and try again.",
+    "submit.notConfigured": "The payment service is not available yet. Please contact us."
   },
   fr: {
     "common.continue": "Continuer",
@@ -375,7 +387,9 @@ const TRANSLATIONS = {
     "proof.loaded": "Capture d'écran chargée :",
     "proof.required": "Veuillez d'abord téléverser votre capture d'écran de paiement.",
     "proof.errType": "Veuillez choisir une image (JPG, PNG, WebP ou HEIC).",
-    "proof.errSize": "L'image est trop volumineuse (max {max} Mo)."
+    "proof.errSize": "L'image est trop volumineuse (max {max} Mo).",
+    "submit.error": "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
+    "submit.notConfigured": "Le service de paiement n'est pas encore disponible. Contactez-nous."
   }
 };
 
@@ -735,27 +749,78 @@ class App {
     });
   }
 
-  submitPaymentProof() {
+  /* -------------------------------------------------------------
+     Backend (Supabase) : envoi de la preuve + création de la demande
+     ------------------------------------------------------------- */
+  getSupabase() {
+    if (this.supabase) return this.supabase;
+    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) return null;
+    this.supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    return this.supabase;
+  }
+
+  async savePayment() {
+    const db = this.getSupabase();
+    if (!db) throw new Error("not-configured");
+
+    const session = this.checkoutSession;
+    const file = session.uploadedFile;
+    const ext = PROOF_EXTENSIONS[file.type] || "jpg";
+    const proofPath = `${crypto.randomUUID()}.${ext}`;
+
+    const upload = await db.storage
+      .from(PROOF_BUCKET)
+      .upload(proofPath, file, { contentType: file.type, upsert: false });
+    if (upload.error) throw upload.error;
+
+    const isRdc = session.paymentRail === "RDC";
+    const insert = await db.from("payments").insert({
+      full_name: this.userState.name,
+      email: this.userState.email,
+      rail: session.paymentRail,
+      operator: isRdc ? session.selectedOperatorKey : null,
+      country_code: isRdc ? "CD" : session.selectedCountryCode,
+      amount_usd: session.usdTotal,
+      proof_path: proofPath
+    });
+    if (insert.error) throw insert.error;
+  }
+
+  async submitPaymentProof() {
     // The screenshot is mandatory
     if (!this.checkoutSession.uploadedFile) {
       this.showToast(this.t("proof.required"));
       return;
     }
+    if (this.submitting) return;
+    this.submitting = true;
 
-    // Move to Step 3: Verification
+    const submitBtn = document.getElementById("submitProofBtn");
+    submitBtn.disabled = true;
+
+    // Move to Step 3: sending
     this.setStepIndicator(3);
     document.getElementById("checkoutStep2").style.display = "none";
     document.getElementById("checkoutStep3").style.display = "block";
-
     document.getElementById("pollingInProgress").style.display = "flex";
     document.getElementById("pollingSuccess").style.display = "none";
 
-    // Simulate verification
-    clearTimeout(this.pollTimer);
-    this.pollTimer = setTimeout(() => {
+    try {
+      await this.savePayment();
       document.getElementById("pollingInProgress").style.display = "none";
       document.getElementById("pollingSuccess").style.display = "flex";
-    }, 2200);
+    } catch (err) {
+      console.error("Payment submission failed:", err);
+      // Back to step 2 so the learner can retry without losing the screenshot
+      this.setStepIndicator(2);
+      document.getElementById("checkoutStep3").style.display = "none";
+      document.getElementById("checkoutStep2").style.display = "block";
+      const key = err && err.message === "not-configured" ? "submit.notConfigured" : "submit.error";
+      this.showToast(this.t(key));
+    } finally {
+      this.submitting = false;
+      submitBtn.disabled = false;
+    }
   }
 
   copyToClipboard(text) {
