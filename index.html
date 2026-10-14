@@ -239,7 +239,7 @@
                     <span class="rail-card-title">🇨🇩 RDC</span>
                     <span class="rail-card-badge">Mobile Money</span>
                   </div>
-                  <p class="rail-card-desc" data-i18n="checkout.rdcDesc">Orange Money, Airtel Money, Vodacom M-Pesa</p>
+                  <p class="rail-card-desc" data-i18n="checkout.rdcDesc">Orange Money, Vodacom M-Pesa</p>
                 </div>
 
                 <div class="payment-rail-card" id="railCardGlobal" onclick="app.selectPaymentRail('GLOBAL')">
@@ -282,15 +282,11 @@
             <div id="branchRdcPayment">
               <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.65rem;" data-i18n="checkout.selectOperator">Choisissez votre opérateur Mobile Money :</h4>
 
-              <!-- 3 Operators: Orange Money, Airtel Money, M-Pesa -->
+              <!-- 2 Operators: Orange Money, M-Pesa -->
               <div class="selection-grid" id="rdcOperatorsGrid" style="margin-bottom: 1.2rem;">
                 <div class="selection-card selected" id="opOrangeMoney" onclick="app.selectRdcOperator('orangeMoney')">
                   <div style="font-size: 1.5rem;">🟠</div>
                   <div style="font-size: 0.825rem; font-weight: 600; color: var(--text);">Orange Money</div>
-                </div>
-                <div class="selection-card" id="opAirtelMoney" onclick="app.selectRdcOperator('airtelMoney')">
-                  <div style="font-size: 1.5rem;">🔴</div>
-                  <div style="font-size: 0.825rem; font-weight: 600; color: var(--text);">Airtel Money</div>
                 </div>
                 <div class="selection-card" id="opMpesa" onclick="app.selectRdcOperator('mPesa')">
                   <div style="font-size: 1.5rem;">🔴</div>

@@ -11,7 +11,7 @@ Page web interactive du centre de formation **LEARN MORE DATA** : l'apprenant sa
 - Saisie de l'e-mail, puis ouverture immédiate du module **« Effectuer un paiement »**.
 
 ### 2. Étape 1 : « Comment souhaitez-vous payer ? »
-1. **🇨🇩 RDC** : Mobile Money (Orange Money, Airtel Money, Vodacom M-Pesa).
+1. **🇨🇩 RDC** : Mobile Money (Orange Money, Vodacom M-Pesa).
 2. **🌍 Autres pays et cartes** : liste déroulante de tous les pays, paiement via Chariow.
 - Rappel du total en USD, puis bouton **« Continuer vers le paiement »**.
 
@@ -34,7 +34,6 @@ Tout se règle en haut de [`app.js`](app.js) :
 const PAYMENT_CONFIG = {
   rdc: {
     orangeMoney: { name: "Orange Money",   number: "08 40 61 94 70", recipientName: "Elisha" },
-    airtelMoney: { name: "Airtel Money",   number: "09 89 34 20 97", recipientName: "Elisha" },
     mPesa:       { name: "Vodacom M-Pesa", number: "08 20 39 16 55", recipientName: "James" }
   },
   chariowUrl: "https://nbceuxnh.mychariow.shop/prd_9t3aiy2q/checkout"

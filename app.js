@@ -16,12 +16,6 @@ const PAYMENT_CONFIG = {
       number: "08 40 61 94 62",
       recipientName: "Elisha"
     },
-    airtelMoney: {
-      name: "Airtel Money",
-      icon: "🔴",
-      number: "09 89 34 20 97",
-      recipientName: "Elisha"
-    },
     mPesa: {
       name: "Vodacom M-Pesa",
       icon: "🔴",
@@ -272,7 +266,7 @@ const TRANSLATIONS = {
     "checkout.step2": "Payment & Proof",
     "checkout.step3": "Confirmation",
     "checkout.howPay": "How would you like to pay?",
-    "checkout.rdcDesc": "Orange Money, Airtel Money, Vodacom M-Pesa",
+    "checkout.rdcDesc": "Orange Money, Vodacom M-Pesa",
     "checkout.globalDesc": "Secure international payment via Chariow (Cards, etc.)",
     "checkout.selectCountry": "Select your country:",
     "checkout.selectOperator": "Choose your Mobile Money operator:",
@@ -340,7 +334,7 @@ const TRANSLATIONS = {
     "checkout.step2": "Paiement & Preuve",
     "checkout.step3": "Confirmation",
     "checkout.howPay": "Comment souhaitez-vous payer ?",
-    "checkout.rdcDesc": "Orange Money, Airtel Money, Vodacom M-Pesa",
+    "checkout.rdcDesc": "Orange Money, Vodacom M-Pesa",
     "checkout.globalDesc": "Paiement international sécurisé via Chariow",
     "checkout.selectCountry": "Sélectionnez votre pays :",
     "checkout.selectOperator": "Choisissez votre opérateur Mobile Money :",
@@ -641,13 +635,12 @@ class App {
   selectRdcOperator(opKey) {
     this.checkoutSession.selectedOperatorKey = opKey;
 
-    ["opOrangeMoney", "opAirtelMoney", "opMpesa"].forEach(id => {
+    ["opOrangeMoney", "opMpesa"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.remove("selected");
     });
 
     if (opKey === "orangeMoney") document.getElementById("opOrangeMoney").classList.add("selected");
-    if (opKey === "airtelMoney") document.getElementById("opAirtelMoney").classList.add("selected");
     if (opKey === "mPesa") document.getElementById("opMpesa").classList.add("selected");
 
     const opConfig = PAYMENT_CONFIG.rdc[opKey];
