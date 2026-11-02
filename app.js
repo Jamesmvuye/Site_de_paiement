@@ -46,7 +46,7 @@ const PROOF_EXTENSIONS = {
 
 const TRAINING = {
   name: "Formation Data",
-  priceUsd: 30.0
+  priceUsd: 35.0
 };
 
 // ==========================================================================

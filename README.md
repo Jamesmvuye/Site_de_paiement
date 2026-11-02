@@ -39,7 +39,7 @@ const PAYMENT_CONFIG = {
   chariowUrl: "https://nbceuxnh.mychariow.shop/prd_9t3aiy2q/checkout"
 };
 
-const TRAINING = { name: "Formation Data", priceUsd: 30.0 };
+const TRAINING = { name: "Formation Data", priceUsd: 35.0 };
 ```
 
 - `number` / `recipientName` : le numéro et le nom affichés entre parenthèses à côté.
